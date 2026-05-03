@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+*.nbconvert/
+
+# Data & weights (large binaries — store separately)
+data/
+pretrained_weights/
+*.pth
+*.pt
+
+# Outputs
+*.png
+shu_mi_*.png
+eeg_simple_conv_*.png
+
+# uv
+uv.lock
+.python-version
