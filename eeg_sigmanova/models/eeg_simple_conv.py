@@ -27,22 +27,42 @@ class EEGSimpleConv(nn.Module):
     ):
         super().__init__()
         self.rs = Resample(orig_freq=sfreq, new_freq=resampling)
-        self.conv = nn.Conv1d(n_channels, fm, kernel_size=kernel_size, padding=kernel_size // 2, bias=False)
+        self.conv = nn.Conv1d(
+            n_channels,
+            fm,
+            kernel_size=kernel_size,
+            padding=kernel_size // 2,
+            bias=False,
+        )
         self.bn = nn.BatchNorm1d(fm)
 
         blocks = []
         in_fm = fm
         for i in range(n_convs):
             out_fm = int(1.414 * in_fm) if i > 0 else in_fm
-            blocks.append(nn.Sequential(
-                nn.Conv1d(in_fm, out_fm, kernel_size=kernel_size, padding=kernel_size // 2, bias=False),
-                nn.BatchNorm1d(out_fm),
-                nn.MaxPool1d(2),
-                nn.ReLU(),
-                nn.Conv1d(out_fm, out_fm, kernel_size=kernel_size, padding=kernel_size // 2, bias=False),
-                nn.BatchNorm1d(out_fm),
-                nn.ReLU(),
-            ))
+            blocks.append(
+                nn.Sequential(
+                    nn.Conv1d(
+                        in_fm,
+                        out_fm,
+                        kernel_size=kernel_size,
+                        padding=kernel_size // 2,
+                        bias=False,
+                    ),
+                    nn.BatchNorm1d(out_fm),
+                    nn.MaxPool1d(2),
+                    nn.ReLU(),
+                    nn.Conv1d(
+                        out_fm,
+                        out_fm,
+                        kernel_size=kernel_size,
+                        padding=kernel_size // 2,
+                        bias=False,
+                    ),
+                    nn.BatchNorm1d(out_fm),
+                    nn.ReLU(),
+                )
+            )
             in_fm = out_fm
 
         self.blocks = nn.ModuleList(blocks)

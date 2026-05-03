@@ -1,4 +1,3 @@
-from eeg_sigmanova.data.preprocessing import build_lmdb
 from eeg_sigmanova.data.dataset import (
     SHUPatchDataset,
     SHURawDataset,
@@ -6,6 +5,7 @@ from eeg_sigmanova.data.dataset import (
     make_patch_loaders,
     make_raw_loaders,
 )
+from eeg_sigmanova.data.preprocessing import build_lmdb
 
 __all__ = [
     "build_lmdb",

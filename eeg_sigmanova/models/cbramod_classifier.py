@@ -75,7 +75,9 @@ class CBraModBinaryClassifier(nn.Module):
                 nn.Linear(d_model, 1),
                 Rearrange("b 1 -> (b 1)"),
             )
-        elif classifier == "all_patch_reps": # all_patch_reps — 3-layer MLP (paper default)
+        elif (
+            classifier == "all_patch_reps"
+        ):  # all_patch_reps — 3-layer MLP (paper default)
             self.head = nn.Sequential(
                 Rearrange("b c s d -> b (c s d)"),
                 nn.Linear(flat, 4 * d_model),

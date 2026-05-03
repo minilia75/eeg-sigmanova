@@ -74,7 +74,9 @@ class Trainer:
             epoch_losses.append(loss.item())
         return float(np.mean(epoch_losses))
 
-    def fit(self, train_loader: DataLoader, val_loader: DataLoader, epochs: int) -> None:
+    def fit(
+        self, train_loader: DataLoader, val_loader: DataLoader, epochs: int
+    ) -> None:
         """Train for `epochs`, saving the best checkpoint by val ROC-AUC."""
         for epoch in range(1, epochs + 1):
             t0 = timer()
@@ -84,8 +86,11 @@ class Trainer:
                 self.scheduler.step()
 
             val_m = evaluate(
-                self.model, val_loader, self.device,
-                criterion=self.criterion, use_sigmoid=self.use_sigmoid,
+                self.model,
+                val_loader,
+                self.device,
+                criterion=self.criterion,
+                use_sigmoid=self.use_sigmoid,
             )
             elapsed = (timer() - t0) / 60
 
@@ -115,7 +120,9 @@ class Trainer:
                 f"{elapsed:.1f} min{flag}"
             )
 
-        logger.info(f"\nBest validation ROC-AUC {self.best_roc_auc:.4f} at epoch {self.best_epoch}")
+        logger.info(
+            f"\nBest validation ROC-AUC {self.best_roc_auc:.4f} at epoch {self.best_epoch}"
+        )
 
     def load_best(self) -> None:
         """Restore the best checkpoint weights into the model in-place."""

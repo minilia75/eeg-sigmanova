@@ -59,12 +59,20 @@ class TransformerEncoderLayer(nn.Module):
         factory_kwargs = {"device": device, "dtype": dtype}
         super().__init__()
         self.self_attn_s = nn.MultiheadAttention(
-            d_model // 2, nhead // 2, dropout=dropout, bias=bias,
-            batch_first=batch_first, **factory_kwargs,
+            d_model // 2,
+            nhead // 2,
+            dropout=dropout,
+            bias=bias,
+            batch_first=batch_first,
+            **factory_kwargs,
         )
         self.self_attn_t = nn.MultiheadAttention(
-            d_model // 2, nhead // 2, dropout=dropout, bias=bias,
-            batch_first=batch_first, **factory_kwargs,
+            d_model // 2,
+            nhead // 2,
+            dropout=dropout,
+            bias=bias,
+            batch_first=batch_first,
+            **factory_kwargs,
         )
         self.linear1 = nn.Linear(d_model, dim_feedforward, bias=bias, **factory_kwargs)
         self.dropout = nn.Dropout(dropout)
@@ -99,7 +107,9 @@ class TransformerEncoderLayer(nn.Module):
         is_causal: bool = False,
     ) -> Tensor:
         x = src
-        x = x + self._sa_block(self.norm1(x), src_mask, src_key_padding_mask, is_causal=is_causal)
+        x = x + self._sa_block(
+            self.norm1(x), src_mask, src_key_padding_mask, is_causal=is_causal
+        )
         x = x + self._ff_block(self.norm2(x))
         return x
 
@@ -113,23 +123,40 @@ class TransformerEncoderLayer(nn.Module):
         bz, ch_num, patch_num, patch_size = x.shape
         half = patch_size // 2
 
-        xs = x[:, :, :, :half].transpose(1, 2).contiguous().view(bz * patch_num, ch_num, half)
+        xs = (
+            x[:, :, :, :half]
+            .transpose(1, 2)
+            .contiguous()
+            .view(bz * patch_num, ch_num, half)
+        )
         xt = x[:, :, :, half:].contiguous().view(bz * ch_num, patch_num, half)
 
         xs = self.self_attn_s(
-            xs, xs, xs, attn_mask=attn_mask, key_padding_mask=key_padding_mask, need_weights=False
+            xs,
+            xs,
+            xs,
+            attn_mask=attn_mask,
+            key_padding_mask=key_padding_mask,
+            need_weights=False,
         )[0]
         xs = xs.contiguous().view(bz, patch_num, ch_num, half).transpose(1, 2)
 
         xt = self.self_attn_t(
-            xt, xt, xt, attn_mask=attn_mask, key_padding_mask=key_padding_mask, need_weights=False
+            xt,
+            xt,
+            xt,
+            attn_mask=attn_mask,
+            key_padding_mask=key_padding_mask,
+            need_weights=False,
         )[0]
         xt = xt.contiguous().view(bz, ch_num, patch_num, half)
 
         return self.dropout1(torch.cat([xs, xt], dim=3))
 
     def _ff_block(self, x: Tensor) -> Tensor:
-        return self.dropout2(self.linear2(self.dropout(self.activation(self.linear1(x)))))
+        return self.dropout2(
+            self.linear2(self.dropout(self.activation(self.linear1(x))))
+        )
 
 
 def _get_activation_fn(activation: str) -> Callable[[Tensor], Tensor]:

@@ -172,7 +172,9 @@ def make_raw_loaders(
     Pass pre-computed mean/std to skip the training-set scan.
     """
     if mean is None or std is None:
-        mean, std = compute_channel_stats(lmdb_path, n_channels, num_workers=num_workers)
+        mean, std = compute_channel_stats(
+            lmdb_path, n_channels, num_workers=num_workers
+        )
 
     loaders = {
         mode: DataLoader(

@@ -2,7 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from eeg_sigmanova.models.criss_cross_transformer import TransformerEncoder, TransformerEncoderLayer
+from eeg_sigmanova.models.criss_cross_transformer import (
+    TransformerEncoder,
+    TransformerEncoderLayer,
+)
 
 __all__ = ["CBraMod", "PatchEmbedding"]
 
@@ -28,13 +31,17 @@ class CBraMod(nn.Module):
             norm_first=True,
             activation=F.gelu,
         )
-        self.encoder = TransformerEncoder(encoder_layer, num_layers=n_layer, enable_nested_tensor=False)
+        self.encoder = TransformerEncoder(
+            encoder_layer, num_layers=n_layer, enable_nested_tensor=False
+        )
         self.proj_out = nn.Sequential(
             nn.Linear(d_model, out_dim),
         )
         self.apply(_weights_init)
 
-    def forward(self, x: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor:
+    def forward(
+        self, x: torch.Tensor, mask: torch.Tensor | None = None
+    ) -> torch.Tensor:
         patch_emb = self.patch_embedding(x, mask)
         feats = self.encoder(patch_emb)
         return self.proj_out(feats)
@@ -71,7 +78,9 @@ class PatchEmbedding(nn.Module):
             nn.Dropout(0.1),
         )
 
-    def forward(self, x: torch.Tensor, mask: torch.Tensor | None = None) -> torch.Tensor:
+    def forward(
+        self, x: torch.Tensor, mask: torch.Tensor | None = None
+    ) -> torch.Tensor:
         bz, ch_num, patch_num, patch_size = x.shape
 
         if mask is None:
@@ -82,7 +91,11 @@ class PatchEmbedding(nn.Module):
 
         mask_x = mask_x.contiguous().view(bz, 1, ch_num * patch_num, patch_size)
         patch_emb = self.proj_in(mask_x)
-        patch_emb = patch_emb.permute(0, 2, 1, 3).contiguous().view(bz, ch_num, patch_num, self.d_model)
+        patch_emb = (
+            patch_emb.permute(0, 2, 1, 3)
+            .contiguous()
+            .view(bz, ch_num, patch_num, self.d_model)
+        )
 
         spectral_input = mask_x.contiguous().view(bz * ch_num * patch_num, patch_size)
         spectral = torch.fft.rfft(spectral_input, dim=-1, norm="forward")

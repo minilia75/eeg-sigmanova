@@ -5,6 +5,7 @@ Usage:
     uv run python scripts/train_cbramod.py training.epochs=100
     uv run python scripts/train_cbramod.py model.finetune_mode=full training.lr_backbone=1e-5
 """
+
 import logging
 import sys
 from pathlib import Path
@@ -27,8 +28,11 @@ log = logging.getLogger(__name__)
 
 @hydra.main(version_base=None, config_path="../configs", config_name="train_cbramod")
 def main(cfg: DictConfig) -> None:
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s",
-                        handlers=[logging.StreamHandler(sys.stdout)])
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(message)s",
+        handlers=[logging.StreamHandler(sys.stdout)],
+    )
 
     device = get_device(cfg.training.device)
     set_seed(cfg.training.seed)
@@ -76,18 +80,33 @@ def main(cfg: DictConfig) -> None:
 
     for name, param in model.named_parameters():
         if "backbone" in name:
-            param.requires_grad = (cfg.model.finetune_mode == "full")
+            param.requires_grad = cfg.model.finetune_mode == "full"
 
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total = sum(p.numel() for p in model.parameters())
-    log.info(f"Trainable params: {trainable:,} / {total:,}  ({100 * trainable / total:.1f}%)")
+    log.info(
+        f"Trainable params: {trainable:,} / {total:,}  ({100 * trainable / total:.1f}%)"
+    )
 
     if cfg.model.finetune_mode == "head_only":
-        param_groups = [{"params": [p for p in model.parameters() if p.requires_grad], "lr": cfg.training.lr_head}]
+        param_groups = [
+            {
+                "params": [p for p in model.parameters() if p.requires_grad],
+                "lr": cfg.training.lr_head,
+            }
+        ]
     else:
         param_groups = [
-            {"params": [p for n, p in model.named_parameters() if "backbone" in n], "lr": cfg.training.lr_backbone},
-            {"params": [p for n, p in model.named_parameters() if "backbone" not in n], "lr": cfg.training.lr_head},
+            {
+                "params": [p for n, p in model.named_parameters() if "backbone" in n],
+                "lr": cfg.training.lr_backbone,
+            },
+            {
+                "params": [
+                    p for n, p in model.named_parameters() if "backbone" not in n
+                ],
+                "lr": cfg.training.lr_head,
+            },
         ]
 
     optimizer = torch.optim.AdamW(param_groups, weight_decay=cfg.training.weight_decay)
@@ -119,7 +138,10 @@ def main(cfg: DictConfig) -> None:
     log.info(f"  ROC-AUC           : {test_m['roc_auc']:.4f}")
     log.info(f"  PR-AUC            : {test_m['pr_auc']:.4f}")
 
-    ckpt = Path(cfg.training.checkpoint_dir) / f"shu_mi_epoch{trainer.best_epoch}_roc{trainer.best_roc_auc:.4f}.pth"
+    ckpt = (
+        Path(cfg.training.checkpoint_dir)
+        / f"shu_mi_epoch{trainer.best_epoch}_roc{trainer.best_roc_auc:.4f}.pth"
+    )
     trainer.save(ckpt)
 
 

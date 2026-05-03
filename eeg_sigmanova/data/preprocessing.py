@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
-from eeg_sigmanova.constant import _LMDB_MAP_SIZE, _COMMIT_EVERY
+from eeg_sigmanova.constant import _COMMIT_EVERY, _LMDB_MAP_SIZE
 
 
 def _lmdb_is_valid(lmdb_path: Path) -> bool:
@@ -45,7 +45,9 @@ def build_lmdb(
         return
 
     if lmdb_path.exists():
-        logger.warning(f"Incomplete LMDB found at {lmdb_path} — removing and rebuilding.")
+        logger.warning(
+            f"Incomplete LMDB found at {lmdb_path} — removing and rebuilding."
+        )
         shutil.rmtree(lmdb_path)
 
     lmdb_path.mkdir(parents=True, exist_ok=True)
@@ -66,11 +68,11 @@ def build_lmdb(
         split_name = subject_to_split[subj_id]
 
         mat = scipy.io.loadmat(mat_path)
-        eeg = mat["data"]        # (100, n_channels, n_points)
+        eeg = mat["data"]  # (100, n_channels, n_points)
         labels = mat["labels"][0]  # (100,)
 
-        eeg_rs = sp_signal.resample(eeg, 800, axis=2)          # → (100, n_channels, 800)
-        eeg_rs = eeg_rs.reshape(eeg_rs.shape[0], 32, 4, 200)   # → (100, 32, 4, 200)
+        eeg_rs = sp_signal.resample(eeg, 800, axis=2)  # → (100, n_channels, 800)
+        eeg_rs = eeg_rs.reshape(eeg_rs.shape[0], 32, 4, 200)  # → (100, 32, 4, 200)
 
         for trial_idx, (sample, label) in enumerate(zip(eeg_rs, labels)):
             key = f"sub{subj_id:03d}-{ses_id}-trial{trial_idx:03d}"

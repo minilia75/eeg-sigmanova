@@ -5,6 +5,7 @@ Usage:
     uv run python scripts/train_eegsimpleconv.py training.epochs=100 model.fm=128
     uv run python scripts/train_eegsimpleconv.py training.lr=5e-4
 """
+
 import logging
 import sys
 from pathlib import Path
@@ -24,15 +25,22 @@ from eeg_sigmanova.utils import get_device, set_seed
 log = logging.getLogger(__name__)
 
 
-@hydra.main(version_base=None, config_path="../configs", config_name="train_eegsimpleconv")
+@hydra.main(
+    version_base=None, config_path="../configs", config_name="train_eegsimpleconv"
+)
 def main(cfg: DictConfig) -> None:
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s",
-                        handlers=[logging.StreamHandler(sys.stdout)])
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(message)s",
+        handlers=[logging.StreamHandler(sys.stdout)],
+    )
 
     device = get_device(cfg.training.device)
     set_seed(cfg.training.seed)
     log.info(f"Device: {device}")
-    log.info(f"Model: EEGSimpleConv  fm={cfg.model.fm}  n_convs={cfg.model.n_convs}  resampling={cfg.model.resampling}  kernel={cfg.model.kernel_size}")
+    log.info(
+        f"Model: EEGSimpleConv  fm={cfg.model.fm}  n_convs={cfg.model.n_convs}  resampling={cfg.model.resampling}  kernel={cfg.model.kernel_size}"
+    )
 
     build_lmdb(
         mat_dir=Path(cfg.data.mat_dir),
@@ -97,7 +105,10 @@ def main(cfg: DictConfig) -> None:
     log.info(f"  ROC-AUC           : {test_m['roc_auc']:.4f}")
     log.info(f"  PR-AUC            : {test_m['pr_auc']:.4f}")
 
-    ckpt = Path(cfg.training.checkpoint_dir) / f"eegsimpleconv_epoch{trainer.best_epoch}_roc{trainer.best_roc_auc:.4f}.pth"
+    ckpt = (
+        Path(cfg.training.checkpoint_dir)
+        / f"eegsimpleconv_epoch{trainer.best_epoch}_roc{trainer.best_roc_auc:.4f}.pth"
+    )
     trainer.save(ckpt)
 
 
