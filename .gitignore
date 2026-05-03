@@ -12,7 +12,7 @@ build/
 *.nbconvert/
 
 # Data & weights (large binaries — store separately)
-data/
+data/*
 pretrained_weights/
 *.pth
 *.pt
