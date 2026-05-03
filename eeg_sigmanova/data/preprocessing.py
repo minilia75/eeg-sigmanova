@@ -1,3 +1,4 @@
+import logging
 import pickle
 import shutil
 from pathlib import Path
@@ -7,6 +8,8 @@ import numpy as np
 import scipy.io
 from scipy import signal as sp_signal
 from tqdm import tqdm
+
+logger = logging.getLogger(__name__)
 
 from eeg_sigmanova.constant import _LMDB_MAP_SIZE, _COMMIT_EVERY
 
@@ -38,11 +41,11 @@ def build_lmdb(
     A '__keys__' sentinel maps split names to lists of record keys.
     """
     if _lmdb_is_valid(lmdb_path):
-        print(f"Valid LMDB found at {lmdb_path} — skipping build.")
+        logger.info(f"Valid LMDB found at {lmdb_path} — skipping build.")
         return
 
     if lmdb_path.exists():
-        print(f"Incomplete LMDB found at {lmdb_path} — removing and rebuilding...")
+        logger.warning(f"Incomplete LMDB found at {lmdb_path} — removing and rebuilding.")
         shutil.rmtree(lmdb_path)
 
     lmdb_path.mkdir(parents=True, exist_ok=True)
@@ -84,7 +87,7 @@ def build_lmdb(
     db.close()
 
     total = sum(len(v) for v in keys_index.values())
-    print(f"\nLMDB written to {lmdb_path}")
+    logger.info(f"LMDB written to {lmdb_path}")
     for name in ("train", "val", "test"):
-        print(f"  {name:5s}: {len(keys_index[name]):5d} trials")
-    print(f"  total: {total} trials")
+        logger.info(f"  {name:5s}: {len(keys_index[name]):5d} trials")
+    logger.info(f"  total: {total} trials")
