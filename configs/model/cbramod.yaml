@@ -1,0 +1,11 @@
+weights_path: pretrained_weights/pretrained_weights.pth
+in_dim: 200
+out_dim: 200
+d_model: 200
+dim_feedforward: 800
+seq_len: 30
+n_layer: 12
+nhead: 8
+finetune_mode: head_only  # head_only | full
+classifier: all_patch_reps  # all_patch_reps | all_patch_reps_twolayer | all_patch_reps_onelayer | avgpooling_patch_reps
+dropout: 0.1

@@ -1,0 +1,9 @@
+defaults:
+  - data: shu_mi
+  - model: eeg_simple_conv
+  - training: eeg_simple_conv
+  - _self_
+
+hydra:
+  job:
+    chdir: false

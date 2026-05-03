@@ -1,0 +1,9 @@
+defaults:
+  - data: shu_mi
+  - model: cbramod
+  - training: cbramod
+  - _self_
+
+hydra:
+  job:
+    chdir: false

@@ -1,0 +1,9 @@
+seed: 3407
+epochs: 50
+batch_size: 64
+lr: 1.0e-3
+weight_decay: 0.05
+clip_value: 1.0
+num_workers: 4
+checkpoint_dir: checkpoints
+device: cuda

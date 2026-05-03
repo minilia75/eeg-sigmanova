@@ -1,0 +1,9 @@
+mat_dir: data/shu-dataset/mat_files/mat
+lmdb_path: data/shu-dataset/processed_lmdb
+train_subjects: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+val_subjects: [16, 17, 18, 19, 20]
+test_subjects: [21, 22, 23, 24, 25]
+n_channels: 32
+n_patches: 4
+patch_size: 200
+scale: 100.0

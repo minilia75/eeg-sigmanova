@@ -1,0 +1,8 @@
+fm: 64
+n_convs: 4
+resampling: 128
+kernel_size: 8
+n_channels: 32
+n_classes: 2
+sfreq: 800
+n_subjects: null
