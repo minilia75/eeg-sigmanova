@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eeg-sigmanova"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "einops",
+    "huggingface-hub>=0.20.0",
+    "hydra-core>=1.3.2",
+    "jupyter>=1.1.1",
+    "lmdb",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "scipy",
+    "torch>=2.0",
+    "torchaudio>=2.0",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "jupyter", "nbconvert", "ipykernel"]
+
+[project.scripts]
+train-cbramod = "scripts.train_cbramod:main"
+train-eegsimpleconv = "scripts.train_eegsimpleconv:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["eeg_sigmanova*", "scripts*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
